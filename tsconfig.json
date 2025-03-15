@@ -5,6 +5,18 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@http/*": [
+        "src/http/*"
+      ],
+      "@interfaces/*": [
+        "src/interfaces/*"
+      ]
+    }
   }
 }
