@@ -8,7 +8,6 @@ import config from '@utils/config';
 import routes from '@http/routes';
 import { CustomFastifyInstance } from 'src/interfaces/customFastify';
 
-
 const redisClient: RedisClientType = createClient({
     url: config.redis.url
 });
@@ -18,7 +17,6 @@ const setAsync = promisify(redisClient.set).bind(redisClient);
 const delAsync = promisify(redisClient.del).bind(redisClient);
 
 const pgPool = new Pool(config.postgres);
-
 
 async function init() {
 

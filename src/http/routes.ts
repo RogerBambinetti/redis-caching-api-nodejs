@@ -1,55 +1,55 @@
-import { FastifyRequest, FastifyReply } from "fastify"
-import { CustomFastifyInstance } from "@interfaces/customFastify"
+import { FastifyRequest, FastifyReply } from "fastify";
+import { CustomFastifyInstance } from "@interfaces/customFastify";
 
 export async function routes(fastify: CustomFastifyInstance) {
-    const { pg, redis } = fastify
+    const { pg, redis } = fastify;
 
     fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
-        const cacheKey = 'users:all'
+        const cacheKey = 'users:all';
 
         // Try to get from cache first
-        const cachedData = await redis.get(cacheKey)
+        const cachedData = await redis.get(cacheKey);
         if (cachedData) {
-            request.log.info('Cache hit for all users')
-            return JSON.parse(cachedData)
+            request.log.info('Cache hit for all users');
+            return JSON.parse(cachedData);
         }
 
         // If not in cache, get from DB
-        const result = await pg.query('SELECT id, name, email FROM users ORDER BY id')
-        const users = result.rows
+        const result = await pg.query('SELECT id, name, email FROM users ORDER BY id');
+        const users = result.rows;
 
         // Cache the result
-        await redis.set(cacheKey, JSON.stringify(users), 'EX', redis.ttl)
+        await redis.set(cacheKey, JSON.stringify(users), 'EX', redis.ttl);
 
-        return users
-    })
+        return users;
+    });
 
     fastify.get('/:id', async (request: FastifyRequest, reply: FastifyReply) => {
-        const { id } = request.params
-        const cacheKey = `users:${id}`
+        const { id } = request.params;
+        const cacheKey = `users:${id}`;
 
         // Try to get from cache first
-        const cachedData = await redis.get(cacheKey)
+        const cachedData = await redis.get(cacheKey);
         if (cachedData) {
-            request.log.info(`Cache hit for user ${id}`)
-            return JSON.parse(cachedData)
+            request.log.info(`Cache hit for user ${id}`);
+            return JSON.parse(cachedData);
         }
 
         // If not in cache, get from DB
-        const result = await pg.query('SELECT id, name, email FROM users WHERE id = $1', [id])
+        const result = await pg.query('SELECT id, name, email FROM users WHERE id = $1', [id]);
 
         if (result.rows.length === 0) {
-            reply.code(404)
-            throw new Error('User not found')
+            reply.code(404);
+            throw new Error('User not found');
         }
 
-        const user = result.rows[0]
+        const user = result.rows[0];
 
         // Cache the result
-        await redis.set(cacheKey, JSON.stringify(user), 'EX', redis.ttl)
+        await redis.set(cacheKey, JSON.stringify(user), 'EX', redis.ttl);
 
-        return user
-    })
+        return user;
+    });
 
     fastify.post('/', {
         schema: {
@@ -63,21 +63,21 @@ export async function routes(fastify: CustomFastifyInstance) {
             }
         }
     }, async (request: FastifyRequest, reply: FastifyReply) => {
-        const { name, email } = request.body
+        const { name, email } = request.body;
 
         const result = await pg.query(
             'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id, name, email',
             [name, email]
-        )
+        );
 
-        const newUser = result.rows[0]
+        const newUser = result.rows[0];
 
         // Invalidate cache for all users
-        await redis.del('users:all')
+        await redis.del('users:all');
 
-        reply.code(201)
-        return newUser
-    })
+        reply.code(201);
+        return newUser;
+    });
 
     fastify.put('/:id', {
         schema: {
@@ -98,44 +98,44 @@ export async function routes(fastify: CustomFastifyInstance) {
             }
         }
     }, async (request: FastifyRequest, reply: FastifyReply) => {
-        const { id } = request.params
-        const { name, email } = request.body
+        const { id } = request.params;
+        const { name, email } = request.body;
 
         const result = await pg.query(
             'UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING id, name, email',
             [name, email, id]
-        )
+        );
 
         if (result.rows.length === 0) {
-            reply.code(404)
-            throw new Error('User not found')
+            reply.code(404);
+            throw new Error('User not found');
         }
 
-        const updatedUser = result.rows[0]
+        const updatedUser = result.rows[0];
 
         // Invalidate caches
-        await redis.del(`users:${id}`)
-        await redis.del('users:all')
+        await redis.del(`users:${id}`);
+        await redis.del('users:all');
 
-        return updatedUser
-    })
+        return updatedUser;
+    });
 
     fastify.delete('/:id', async (request: FastifyRequest, reply: FastifyReply) => {
-        const { id } = request.params
+        const { id } = request.params;
 
-        const result = await pg.query('DELETE FROM users WHERE id = $1 RETURNING id', [id])
+        const result = await pg.query('DELETE FROM users WHERE id = $1 RETURNING id', [id]);
 
         if (result.rows.length === 0) {
-            reply.code(404)
-            throw new Error('User not found')
+            reply.code(404);
+            throw new Error('User not found');
         }
 
         // Invalidate caches
-        await redis.del(`users:${id}`)
-        await redis.del('users:all')
+        await redis.del(`users:${id}`);
+        await redis.del('users:all');
 
-        reply.code(204)
-    })
+        reply.code(204);
+    });
 }
 
 export default routes;
