@@ -1,5 +1,5 @@
 {
-  "name": "rest-api-caching-nodejs",
+  "name": "redis-rest-api",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {

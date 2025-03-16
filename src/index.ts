@@ -5,7 +5,7 @@ import { Pool } from 'pg';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 import config from '@utils/config';
-import routes from '@http/routes';
+import { routes } from '@http/routes';
 import { CustomFastifyInstance } from 'src/interfaces/customFastify';
 
 const redisClient: RedisClientType = createClient({
@@ -26,7 +26,8 @@ async function init() {
 
         await app.listen({ port: 3000 });
 
-        app.register(routes(app), { prefix: '/api/users' });
+        //@ts-ignore
+        app.register(routes, { prefix: '/api/users' });
 
         app.setErrorHandler((error, request: FastifyRequest, reply: FastifyReply) => {
             request.log.error(error);

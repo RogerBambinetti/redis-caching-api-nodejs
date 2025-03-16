@@ -21,7 +21,7 @@ export async function routes(fastify: CustomFastifyInstance) {
         // Cache the result
         await redis.set(cacheKey, JSON.stringify(users), 'EX', redis.ttl);
 
-        return users;
+        return reply.send(users);
     });
 
     fastify.get('/:id', async (request: FastifyRequest, reply: FastifyReply) => {
@@ -48,7 +48,7 @@ export async function routes(fastify: CustomFastifyInstance) {
         // Cache the result
         await redis.set(cacheKey, JSON.stringify(user), 'EX', redis.ttl);
 
-        return user;
+        return reply.send(user);
     });
 
     fastify.post('/', {
@@ -76,7 +76,7 @@ export async function routes(fastify: CustomFastifyInstance) {
         await redis.del('users:all');
 
         reply.code(201);
-        return newUser;
+        return reply.send(newUser);
     });
 
     fastify.put('/:id', {
@@ -117,7 +117,7 @@ export async function routes(fastify: CustomFastifyInstance) {
         await redis.del(`users:${id}`);
         await redis.del('users:all');
 
-        return updatedUser;
+        return reply.send(updatedUser);
     });
 
     fastify.delete('/:id', async (request: FastifyRequest, reply: FastifyReply) => {
@@ -136,6 +136,6 @@ export async function routes(fastify: CustomFastifyInstance) {
 
         reply.code(204);
     });
-}
 
-export default routes;
+    return fastify;
+}
