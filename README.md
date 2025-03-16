@@ -27,8 +27,14 @@ npm install
 ```
 
 2. Set your environment variables correctly in the `.env` file (refer to `.env.example` for guidance):
+   
+3. Now, make sure to run the docker containers using docker compose:
 
-5. Finally, run the project in development mode with:
+```bash
+docker compose up -d
+```
+
+4. Finally, run the project in development mode with:
 
 ```bash
 npm start
