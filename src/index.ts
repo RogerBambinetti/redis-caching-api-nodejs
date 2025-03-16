@@ -4,8 +4,8 @@ import { promisify } from 'util';
 import { Pool } from 'pg';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
-import config from '@utils/config';
-import { routes } from '@http/routes';
+import config from '@/utils/config';
+import { routes } from '@/http/routes';
 import { CustomFastifyInstance } from 'src/interfaces/customFastify';
 
 const redisClient: RedisClientType = createClient({
@@ -44,11 +44,6 @@ async function init() {
             set: setAsync,
             del: delAsync,
             ttl: config.cache.ttl
-        });
-
-        app.addHook('onClose', async (instance) => {
-            await instance.pg.end();
-            redisClient.quit();
         });
 
         app.log.info(`Server listening on ${app.server.address()?.toString()}`);

@@ -16,7 +16,7 @@ interface Config {
 
 const config: Config = {
     redis: {
-        url: process.env.REDIS_URL || 'localhost:6379'
+        url: process.env.REDIS_URL || 'redis://localhost:6379'
     },
     postgres: {
         host: process.env.PG_HOST || 'localhost',
