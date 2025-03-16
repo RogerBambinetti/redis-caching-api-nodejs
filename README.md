@@ -12,7 +12,8 @@ Before you begin, ensure you have met the following requirements:
 
 - Node.js (v20.x).
 - Npm (v8.x)
-- Docker
+- Docker: v27.x
+- Docker Compose: v2.x
   
 ## Installation & Setup
 
